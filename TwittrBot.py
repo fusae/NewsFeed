@@ -87,8 +87,12 @@ class TwitterBot:
     def run(self):
 
         for wechat_userid in self.user_KOL_list:
-
+            
             currrent_following = self.get_current_following(wechat_userid)
+            # if self.user_KOL_following is empty, it means this is the first time run th program
+            # it should be equal with the current_following
+            if self.user_KOL_following[wechat_userid] == {}:
+                self.user_KOL_following[wechat_userid] = currrent_following
 
             # compare each KOL's following ids (lateest 10)
             # To see what's new folloing user id in currrent_following
