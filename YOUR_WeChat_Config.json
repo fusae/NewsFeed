@@ -2,5 +2,34 @@
     "appid": "",
     "appsecret": "",
     "template_id": "",
-    "userids": []
+    "userids": [""],
+    
+    "type": {
+        "News": {
+            "template_id": "",
+            "default_urls": [],
+            "userid_fav": {
+                "A WECHAT USER ID": []
+            }
+        },
+        "Twitter": {
+            "template_id": "",
+            "consumer_key": "",
+            "consumer_secret": "",
+            "access_token": "",
+            "access_token_secret": "",
+            "bearer_token": "",
+        
+            "default_KOL_list": [],
+
+            "userids": [],
+
+            "userid_fav": {
+                "A WECHAT USER ID": []
+            }
+
+        }
+    }
+
 }
+
