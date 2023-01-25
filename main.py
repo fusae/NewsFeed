@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # for each in links:
     #     print(each)
 
-    # newsCollector.run() # only run one time
+    newsCollector.run() # only run one time
 
     print("Runing now...")
     

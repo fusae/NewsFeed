@@ -17,7 +17,6 @@ class NewsCollector:
 	
 	def __init__(self, wechatpush) -> None:
 		
-		self.watch_urls = []
 		# read from file
 		with open(CONFIG_FILE) as f:
 			WeChat_Config = json.load(f)
@@ -36,8 +35,6 @@ class NewsCollector:
 				if userid in userid_fav:
 					self.userid_urls[userid] = userid_fav[userid]
 
-		for url in watch_urls:
-			self.watch_urls.append(url)
 
 		self.session = HTMLSession()
 
@@ -126,11 +123,13 @@ class NewsCollector:
 					elif "https://newsbtc.com/news/" in link and '-' in link:
 
 						if link not in self.news_urls[userid]:
+							print("Found new newsbtc post")
 							links.append(link)
 
 					elif 'articledetails' in link or 'sqarticledetails' in link:
 						
 						if link not in self.news_urls[userid]:
+							print("Found new panewslab post")
 							links.append(link)
 
 			if file_exists:
