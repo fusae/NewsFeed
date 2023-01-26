@@ -19,7 +19,7 @@ class WeChatPush:
         self.appid = WeChat_Config['appid']
         self.appsecret = WeChat_Config['appsecret']
         self.access_token = None
-        self.userids = WeChat_Config['userids']
+        self.userids = WeChat_Config["type"][type]['userids']
         self.template_id = WeChat_Config["type"][type]["template_id"]
         self.type = type
 
@@ -27,6 +27,9 @@ class WeChatPush:
         self.handle_access_token()
 
         f.close()
+
+    def get_userids(self):
+        return self.userids
 
     def cal_expired_time(self, hours=2):
         expired_time = datetime.now() + timedelta(hours=hours)
@@ -143,6 +146,32 @@ class WeChatPush:
                     "template_id": self.template_id,
                     "topcolor": "#FF0000",
                     "url": content["username_url"],
+                    "data": data
+                }
+
+                # call send_message_with_userid function
+                errmsg = self.send_message_with_userid(post_data)
+                print(errmsg)
+
+        elif self.type == "Following_Count":
+
+            data = {
+                "username": {
+                    "value": content["username"]
+                },
+                "handle": {
+                    "value": content["handle"]
+                },
+                "count": {
+                    "value": content["count"]
+                }
+            }
+
+            for userid in self.userids:
+                post_data = {
+                    "touser": userid,
+                    "template_id": self.template_id,
+                    "topcolor": "#FF0000",
                     "data": data
                 }
 
