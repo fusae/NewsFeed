@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import os.path
 import json
 import os
+from datetime import datetime
 
 DIR_PATH = os.getcwd()
 
@@ -13,6 +14,8 @@ NEWS_DATA_DIR = os.path.join(DATA_DIR, "News")
 if not os.path.exists(NEWS_DATA_DIR):
 	os.makedirs(NEWS_DATA_DIR)
 
+DATE = datetime.now().strftime("%Y-%m-%d")
+
 class NewsCollector:
 	
 	def __init__(self, wechatpush) -> None:
@@ -20,7 +23,6 @@ class NewsCollector:
 		# read from file
 		with open(CONFIG_FILE) as f:
 			WeChat_Config = json.load(f)
-			watch_urls = WeChat_Config["type"]["News"]["default_urls"]
 			
 			# assign default urls to every user
 			# and assign fav urls to every user who want to be special
@@ -49,10 +51,13 @@ class NewsCollector:
 	def if_file_exists(self, file_name, userid):
 		if os.path.exists(file_name):
 			
-			# read data from file
+			# read f from file
 			f = open(file_name)
 			data = json.load(f)
-			self.news_urls[userid] = data["urls"]
+
+			for each in data["NewsInfo"]:
+				self.news_urls[userid].append(each['url'])
+			# self.news_urls[userid] = data["urls"]
 			f.close()
 			return True
 
@@ -88,7 +93,7 @@ class NewsCollector:
 			user_file = os.path.join(NEWS_DATA_DIR, userid + ".json")
 			file_exists = self.if_file_exists(user_file, userid)
 
-			links = []
+			NewsInfo = []
 
 			for each in self.userid_urls[userid]:
 				res = self.session.get(each)
@@ -100,44 +105,65 @@ class NewsCollector:
 
 						if link not in self.news_urls[userid]:
 							print("Found new zendaily post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
 					elif "https://www.theblockbeats.info" in link and "search" not in link and self.has_numbers(link):
 						
 						if link not in self.news_urls[userid]:
 							print("Found new blockbeats post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
 					elif "https://en.bitpush.news/articles" in link and "tag" not in link:
 
 						if link not in self.news_urls[userid]:
 							print("Found new bitpush post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
 					elif "https://nftevening.com" in link and "respond" not in link:
 
 						if link not in self.news_urls[userid]:
 							print("Found new nftevening post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
 					elif "https://newsbtc.com/news/" in link and '-' in link:
 
 						if link not in self.news_urls[userid]:
 							print("Found new newsbtc post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
 					elif 'articledetails' in link or 'sqarticledetails' in link:
 						
 						if link not in self.news_urls[userid]:
 							print("Found new panewslab post")
-							links.append(link)
+							NewsInfo.append({
+								"url": link,
+								"date": DATE
+							})
 
+			links = []
 			if file_exists:
+				for each in NewsInfo:
+					links.append(each["url"])
 				userlinks[userid] = links
 			else:
 				
 				data = {
-					"urls": links
+					"NewsInfo": NewsInfo
 				}
 
 				data = json.dumps(data)
@@ -177,8 +203,14 @@ class NewsCollector:
 					self.news_urls[userid].append(each)
 
 			# Update News_collection.json file
+			NewsInfo = []
+			for each in self.news_urls[userid]:
+				NewsInfo.append({
+					"url": each,
+					"date": DATE 
+				})
 			data = {
-				"urls": self.news_urls[userid]
+				"NewsInfo": NewsInfo
 			}
 			data = json.dumps(data)
 			user_file = os.path.join(NEWS_DATA_DIR, userid + ".json")
