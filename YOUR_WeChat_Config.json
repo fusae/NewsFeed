@@ -1,15 +1,16 @@
 {
     "appid": "",
     "appsecret": "",
-    "template_id": "",
-    "userids": [""],
     
     "type": {
         "News": {
+            "userids": [],
+
             "template_id": "",
             "default_urls": [],
             "userid_fav": {
-                "A WECHAT USER ID": []
+                "otIhR6UbvcJlJTeEOH78VDC8o1s8": [],
+                "otIhR6T9u7mDIgeQkPQYwH-mU2Uk": []
             }
         },
         "Twitter": {
@@ -25,14 +26,22 @@
             "userids": [],
 
             "userid_fav": {
-                "A WECHAT USER ID": []
+                "otIhR6UbvcJlJTeEOH78VDC8o1s8": []
             }
 
+        },
+
+        "Following_Count": {
+            "template_id": "",
+            "userids": []
         }
     },
 
     "utility": {
-        "useid": ""
+        "NewsInfo": {
+            "userids": [],
+            "keywords": []
+        }
     }
 
 }
