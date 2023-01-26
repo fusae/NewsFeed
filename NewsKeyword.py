@@ -67,7 +67,8 @@ class NewsKeyword:
                     print("{}".format(i), title)
                     i += 1
                     for keyword in self.keywords:
-                        if keyword in title:
+                        # only choose articles from BlockBeats
+                        if keyword in title and "BlockBeats" in title:
                             keywords_title[keyword].append(title)
                             print("符合关键词，加入队列")
 
@@ -81,6 +82,13 @@ class NewsKeyword:
             with open(write_user_file, "w") as f:
                 data = json.dumps(keywords_title[keyword], ensure_ascii=False)
                 f.write(data)
+
+        # print to the terminal
+        i = 0
+        for keyword in self.keywords:
+            for each in keywords_title[keyword]:
+                print("{}".format(i), each)
+                i += 1
 
 if __name__ == '__main__':
 
