@@ -28,7 +28,7 @@ class NewsCollector:
 			# and assign fav urls to every user who want to be special
 			self.news_urls = {}
 			self.userid_urls = {}
-			userids = WeChat_Config["userids"]
+			userids = wechatpush.get_userids()
 			default_urls = WeChat_Config["type"]["News"]["default_urls"]
 			userid_fav = WeChat_Config["type"]["News"]["userid_fav"]
 			for userid in userids:
