@@ -7,8 +7,8 @@ from datetime import datetime
 DIR_PATH = os.getcwd()
 CONFIG_FILE = os.path.join(DIR_PATH, "WeChat_Config.json")
 DATA_DIR = os.path.join(DIR_PATH, "Data")
-NEWS_DATA_DIR = os.path.join(DATA_DIR, "News")
-NEWS_INFO_DIR = os.path.join(DATA_DIR, "NewsInfo")
+NEWS_DATA_DIR = os.path.join(DATA_DIR, "News")  # read
+NEWS_INFO_DIR = os.path.join(DATA_DIR, "NewsInfo") # write
 
 DATE = datetime.now().strftime("%Y-%m-%d")
 
@@ -48,7 +48,8 @@ class NewsKeyword:
     # get specific news according keyword in a single data file
     def get_news_from_keyword(self, wechat_userid):
         
-        read_user_file = os.path.join(NEWS_DATA_DIR, wechat_userid + ".json")
+        read_user_dir = os.path.join(NEWS_DATA_DIR, wechat_userid)
+        read_user_file = os.path.join(read_user_dir, DATE + ".json")
        
         # to store the matched title
         keywords_title = {}
@@ -61,9 +62,9 @@ class NewsKeyword:
             NewsInfo = data["NewsInfo"]
 
             i = 0
-            for each in NewsInfo:
-                if each['date'] == DATE:
-                    title = self.parse_news(each["url"])
+            for website in NewsInfo:
+                for left in NewsInfo[website]:
+                    title = self.parse_news(website+left)
                     print("{}".format(i), title)
                     i += 1
                     for keyword in self.keywords:
@@ -97,9 +98,10 @@ if __name__ == '__main__':
     with open(CONFIG_FILE) as f:
             WeChat_Config = json.load(f)
             
-    wechat_userid = WeChat_Config["utility"]["NewsInfo"]["userids"][0]
+    wechat_userids = WeChat_Config["utility"]["NewsInfo"]["userids"]
 
-    nk.get_news_from_keyword(wechat_userid)
+    for wechat_userid in wechat_userids:
+        nk.get_news_from_keyword(wechat_userid)
 
         
 
