@@ -28,10 +28,11 @@ class NewsCollector:
 			# and assign fav urls to every user who want to be special
 			self.news_urls = {}
 			self.userid_urls = {}
-			userids = wechatpush.get_userids()
+			self.userids = wechatpush.get_userids()
 			default_urls = WeChat_Config["type"]["News"]["default_urls"]
+			self.watch_urls = WeChat_Config["type"]["News"]["watch_urls"]
 			userid_fav = WeChat_Config["type"]["News"]["userid_fav"]
-			for userid in userids:
+			for userid in self.userids:
 				self.news_urls[userid] = []
 				self.userid_urls[userid] = default_urls
 				if userid in userid_fav:
@@ -48,22 +49,30 @@ class NewsCollector:
 	def has_numbers(self, inputString):
 		return any(char.isdigit() for char in inputString)
 
-	def if_file_exists(self, file_name, userid):
+	def if_file_exists(self, userid):
+
+		# if the user_id dir not created, then create a new one
+		user_dir = os.path.join(NEWS_DATA_DIR, userid)
+		if not os.path.exists(user_dir):
+			os.makedirs(user_dir)
+		
+		file_name = os.path.join(user_dir, DATE+".json")
 		if os.path.exists(file_name):
 			
 			# read f from file
 			f = open(file_name)
 			data = json.load(f)
 
+			links = []
 			for each in data["NewsInfo"]:
-				self.news_urls[userid].append(each['url'])
-			# self.news_urls[userid] = data["urls"]
+				for left in data["NewsInfo"][each]:
+					links.append(each+left)
+			self.news_urls[userid] = links
 			f.close()
 			return True
 
 		else:
 			# create a new blank file
-			self.news_urls[userid] = []
 			return False
 
 	def parse_news(self, news_url):
@@ -88,12 +97,27 @@ class NewsCollector:
 	# if this news is new, then we add it to links
 	# if this news is old, then we ignore it
 		userlinks = {}
-		for userid in self.userid_urls:
+		for userid in self.userids:
 
-			user_file = os.path.join(NEWS_DATA_DIR, userid + ".json")
-			file_exists = self.if_file_exists(user_file, userid)
+			file_exists = self.if_file_exists(userid)
 
-			NewsInfo = []
+			# init NewsInfo and NewsInfo_in_file
+			# NewsInfo is the dict of self.news_urls(which is a list), key is website's name
+			# NewsInfo_in_file is the dict of the file, which is a dict, compare to new news
+			NewsInfo = {}
+			NewsInfo_in_file = {}
+			for each in self.watch_urls:
+				NewsInfo[each] = []
+				NewsInfo_in_file[each] = []
+
+			news_urls = {}
+	
+			for each in self.news_urls[userid]:
+				for key in NewsInfo_in_file:
+					if key in each:
+						left = each.replace(key, "")
+						NewsInfo_in_file[key].append(left)
+			news_urls[userid] = NewsInfo_in_file
 
 			for each in self.userid_urls[userid]:
 				res = self.session.get(each)
@@ -102,63 +126,59 @@ class NewsCollector:
 				for link in absolute_links:
 
 					if "https://zendaily.xyz/p/" in link and "comments" not in link:
-
-						if link not in self.news_urls[userid]:
+						
+						website = "https://zendaily.xyz/p/"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new zendaily post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							NewsInfo[website].append(left)
 
 					elif "https://www.theblockbeats.info" in link and "search" not in link and self.has_numbers(link):
 						
-						if link not in self.news_urls[userid]:
+						website = "https://www.theblockbeats.info"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new blockbeats post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							NewsInfo[website].append(left)
 
 					elif "https://en.bitpush.news/articles" in link and "tag" not in link:
 
-						if link not in self.news_urls[userid]:
+						website = "https://en.bitpush.news/articles"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new bitpush post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							NewsInfo[website].append(left)
 
 					elif "https://nftevening.com" in link and "respond" not in link:
 
-						if link not in self.news_urls[userid]:
+						website = "https://nftevening.com"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new nftevening post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							NewsInfo[website].append(left)
 
 					elif "https://newsbtc.com/news/" in link and '-' in link:
 
-						if link not in self.news_urls[userid]:
+						website = "https://newsbtc.com/news/"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new newsbtc post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							left = link.split(website)[1]
+							NewsInfo[website].append(left)
 
 					elif 'articledetails' in link or 'sqarticledetails' in link:
 						
-						if link not in self.news_urls[userid]:
+						website = "https://www.panewslab.com/zh/"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
 							print("Found new panewslab post")
-							NewsInfo.append({
-								"url": link,
-								"date": DATE
-							})
+							NewsInfo[website].append(left)
 
 			links = []
 			if file_exists:
 				for each in NewsInfo:
-					links.append(each["url"])
+					for left in NewsInfo[each]:
+						links.append(each+left)
 				userlinks[userid] = links
 			else:
 				
@@ -168,6 +188,8 @@ class NewsCollector:
 
 				data = json.dumps(data)
 
+				user_dir = os.path.join(NEWS_DATA_DIR, userid)
+				user_file = os.path.join(user_dir, DATE+".json")
 				with open(user_file, "w") as f:
 					f.write(data)
 
@@ -202,17 +224,22 @@ class NewsCollector:
 
 					self.news_urls[userid].append(each)
 
-			# Update News_collection.json file
-			NewsInfo = []
+			# Update file
+			NewsInfo = {}
+			for each in self.watch_urls:
+				NewsInfo[each] = []
+
 			for each in self.news_urls[userid]:
-				NewsInfo.append({
-					"url": each,
-					"date": DATE 
-				})
+				for key in NewsInfo:
+					if key in each:
+						left = each.replace(key, "")
+						NewsInfo[key].append(left)
+
 			data = {
 				"NewsInfo": NewsInfo
 			}
 			data = json.dumps(data)
-			user_file = os.path.join(NEWS_DATA_DIR, userid + ".json")
+			user_dir = os.path.join(NEWS_DATA_DIR, userid)
+			user_file = os.path.join(user_dir, DATE+".json")
 			with open(user_file, "w") as f:
 				f.write(data)
