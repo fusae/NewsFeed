@@ -53,7 +53,7 @@ def get_common_following(bot, userids):
                 bot.wechatpush.send_message(content)
 
                 # sign string as md5 string, and save it to local file, to avoid send repeatly
-                md5_string = hashlib.md5((handle+count).encode('utf-8')).hexdigest()
+                md5_string = hashlib.md5((handle+str(count)).encode('utf-8')).hexdigest()
                 md5_list.append(md5_string)
 
         data = {'md5': md5_list}
