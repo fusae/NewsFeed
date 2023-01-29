@@ -56,6 +56,7 @@ class NewsCollector:
 		if not os.path.exists(user_dir):
 			os.makedirs(user_dir)
 		
+		# Only check the day's news
 		file_name = os.path.join(user_dir, DATE+".json")
 		if os.path.exists(file_name):
 			
