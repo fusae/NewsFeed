@@ -48,19 +48,28 @@ class TwitterBot:
                 i = 0
                 for username in self.user_KOL_list[wechat_userid]:
                     twitter_userid = self.get_user_id(username)
-                    if twitter_userid is None:
-                        continue
                     self.user_KOL_list[wechat_userid][i] = twitter_userid
                     i += 1
+
+            # clear those unvalid ids, they are None
+            for wechat_useid in self.user_KOL_list:
+                i = 0
+                for each in self.user_KOL_list[wechat_useid]:
+                    if each is None:
+                        del self.user_KOL_list[wechat_useid][i]
+                    
+                    i += 1
+
 
     # list the latest 10(default) following users' name by user id
     # return the list of user id and name and handle name
     def list_user_following(self, twitter_userid, max_results=10):
-      
+        print("Getting {0} following from {1}".format(str(max_results), twitter_userid))
         users = []
         response = self.client.get_users_following(twitter_userid, user_fields=["profile_image_url"], max_results=max_results)
 
         for user in response.data:
+            print(user.id, user.name, user.username)
             users.append((user.id, user.name, user.username))
 
         return users
@@ -69,6 +78,7 @@ class TwitterBot:
         user_file = os.path.join(TWITTER_DATA_DIR, wechat_userid + ".json")
         file_exists = self.if_file_exists(user_file, wechat_userid)
         following_dict = {}
+        print("Get current following in {}".format(user_file))
 
         for twitter_userid in self.user_KOL_list[wechat_userid]:
             users = self.list_user_following(twitter_userid=twitter_userid)
@@ -146,6 +156,7 @@ class TwitterBot:
             # read data from file
             f = open(file_name)
             data = json.load(f)
+            print("Reading data in {}".format(file_name))
             self.user_KOL_following[wechat_userid] = data
             f.close()
 
