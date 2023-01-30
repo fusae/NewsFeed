@@ -66,7 +66,7 @@ def get_common_following(bot, userids):
                 md5_string = hashlib.md5((handle+str(count)).encode('utf-8')).hexdigest()
 
                 if md5_string not in md5_list:
-                    bot.wechatpush.send_message(content)
+                    bot.wechatpush.send_message(content, tousers=[userid])
                     md5_list.append(md5_string)
 
         data = {'md5': md5_list}

@@ -48,6 +48,8 @@ class TwitterBot:
                 i = 0
                 for username in self.user_KOL_list[wechat_userid]:
                     twitter_userid = self.get_user_id(username)
+                    if twitter_userid is None:
+                        continue
                     self.user_KOL_list[wechat_userid][i] = twitter_userid
                     i += 1
 
@@ -110,7 +112,7 @@ class TwitterBot:
                             "username_url": "https://twitter.com/" + self.get_user_username(each)
                         }
 
-                        self.wechatpush.send_message(content)
+                        self.wechatpush.send_message(content, tousers=[twitter_userid])
 
                     # update currrent_following to local file
                     user_file = os.path.join(TWITTER_DATA_DIR, wechat_userid + ".json")
@@ -131,6 +133,9 @@ class TwitterBot:
     # get user id by twitter handle
     def get_user_id(self, screen_name):
         user = self.client.get_user(username=screen_name)
+        if user.data is None:
+            return None
+
         twitter_userid = user.data['id']
 
         return twitter_userid
