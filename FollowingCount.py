@@ -37,18 +37,7 @@ def get_common_following(bot, userids):
         most_common = Counter(total_following).most_common()
 
         md5_list = []
-        user_file = os.path.join(FOLLOWING_COUNT_DIR, userid + ".json")
-        if not os.path.exists(user_file):
-            with open(user_file, "w"):
-                data = {"md5":[]}
-                data = json.dumps(data)
-                f.write(data)
-                    
-        # read the file to see if md5 string exists
-        with open(user_file) as f:
-            data = json.load(f)
-            md5_list = data["md5"]
-
+        md5_list_from_file = []
         for each in most_common:
             if each[1] > 1:
                 print(each[0])
@@ -69,9 +58,26 @@ def get_common_following(bot, userids):
                     bot.wechatpush.send_message(content, tousers=[userid])
                     md5_list.append(md5_string)
 
-        data = {'md5': md5_list}
+        user_file = os.path.join(FOLLOWING_COUNT_DIR, userid + ".json")
+
+        file_exists = os.path.join(user_file)
+
+        # if file exist, the update data
+        if file_exists:
+            with open(user_file) as f:
+                data = json.load(f)
+                md5_list_from_file = data["md5"]
+
+                for each in md5_list:
+                    if each not in md5_list_from_file:
+                        md5_list_from_file.append(each)
+                        
+        # if not exist, then write a new one
+        else:
+            md5_list_from_file = md5_list
 
         with open(user_file, "w") as f:
+            data = {"md5": md5_list_from_file}
             data = json.dumps(data)
             f.write(data)
 
