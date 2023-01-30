@@ -103,7 +103,11 @@ class WeChatPush:
 
         # Timer(60 * 60 * 2, self.get_access_token).start()
 
-    def send_message(self, content):
+    def send_message(self, content, tousers=[]):
+
+        # if tousers is empty, then defauly tousers is self.userids
+        if len(tousers) == 0:
+            tousers = self.userids
 
         if self.type == "News":
             title = content['title']
@@ -116,7 +120,7 @@ class WeChatPush:
                 }
             }
 
-            for userid in self.userids:
+            for userid in tousers:
                 post_data = {
                     "touser": userid,
                     "template_id": self.template_id,
@@ -140,7 +144,7 @@ class WeChatPush:
                 }
             }
 
-            for userid in self.userids:
+            for userid in tousers:
                 post_data = {
                     "touser": userid,
                     "template_id": self.template_id,
@@ -167,7 +171,7 @@ class WeChatPush:
                 }
             }
 
-            for userid in self.userids:
+            for userid in tousers:
                 post_data = {
                     "touser": userid,
                     "template_id": self.template_id,

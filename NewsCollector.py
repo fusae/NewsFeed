@@ -221,7 +221,7 @@ class NewsCollector:
 						"news_url": url
 					}
 
-					self.wechatpush.send_message(content)
+					self.wechatpush.send_message(content, tousers=[userid])
 
 					self.news_urls[userid].append(each)
 
