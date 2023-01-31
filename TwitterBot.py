@@ -101,7 +101,7 @@ class TwitterBot:
         for wechat_userid in self.user_KOL_list:
             
             currrent_following = self.get_current_following(wechat_userid)
-            # if self.user_KOL_following is empty, it means this is the first time run th program
+            # if self.user_KOL_following is empty, it means this is the first time run the program
             # it should be equal with the current_following
             if self.user_KOL_following[wechat_userid] == {}:
                 self.user_KOL_following[wechat_userid] = currrent_following
@@ -122,7 +122,7 @@ class TwitterBot:
                             "username_url": "https://twitter.com/" + self.get_user_username(each)
                         }
 
-                        self.wechatpush.send_message(content, tousers=[twitter_userid])
+                        self.wechatpush.send_message(content, tousers=[wechat_userid])
 
                     # update currrent_following to local file
                     user_file = os.path.join(TWITTER_DATA_DIR, wechat_userid + ".json")
