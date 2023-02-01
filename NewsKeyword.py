@@ -80,7 +80,7 @@ class NewsKeyword:
 
         for keyword in keywords_title:
             write_user_file = os.path.join(write_user_dir, keyword + '-' + DATE + '.json')
-            with open(write_user_file, "w") as f:
+            with open(write_user_file, "w", encoding= 'utf-8') as f:
                 data = json.dumps(keywords_title[keyword], ensure_ascii=False)
                 f.write(data)
 
