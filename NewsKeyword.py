@@ -20,7 +20,7 @@ class NewsKeyword:
 
     def __init__(self):
 
-        with open(CONFIG_FILE) as f:
+        with open(CONFIG_FILE, encoding= 'utf-8') as f:
             WeChat_Config = json.load(f)
 
             self.wechat_userids = WeChat_Config["utility"]["NewsInfo"]["userids"]
