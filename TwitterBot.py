@@ -68,9 +68,12 @@ class TwitterBot:
         users = []
         response = self.client.get_users_following(twitter_userid, user_fields=["profile_image_url"], max_results=max_results)
 
-        for user in response.data:
-            print(user.id, user.name, user.username)
-            users.append((user.id, user.name, user.username))
+        if response.data is None:
+            pass
+        else:
+            for user in response.data:
+                print(user.id, user.name, user.username)
+                users.append((user.id, user.name, user.username))
 
         return users
 
@@ -133,11 +136,19 @@ class TwitterBot:
     # get user's handle name
     def get_user_username(self, twitter_userid):
         user = self.client.get_user(id=twitter_userid)
+
+        if user.data is None:
+            return None
+
         return user.data['username']
 
     # get user's name
     def get_user_name(self, twitter_userid):
         user = self.client.get_user(id=twitter_userid)
+
+        if user.data is None:
+            return None
+
         return user.data['name']
 
     # get user id by twitter handle
