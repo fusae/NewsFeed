@@ -41,7 +41,14 @@
     "utility": {
         "NewsInfo": {
             "userids": [],
-            "keywords": []
+            "keywords": [],
+            "email": {
+                "user": "",
+                "password": "",
+                "host": "",
+                "sender": "",
+                "receivers": []
+            }
         }
     }
 
