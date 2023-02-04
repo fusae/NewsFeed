@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import os
 import json
 from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
 
 DIR_PATH = os.getcwd()
 CONFIG_FILE = os.path.join(DIR_PATH, "WeChat_Config.json")
@@ -91,6 +93,29 @@ class NewsKeyword:
                 print("{}".format(i), each)
                 i += 1
 
+        return keywords_title
+
+    def send_email(self, subject, content):
+
+        with open(CONFIG_FILE) as f:
+            WeChat_Config = json.load(f)
+            
+        email = WeChat_Config["utility"]["NewsInfo"]["email"]
+
+        msg = MIMEText(content, 'plain', 'utf-8')
+        msg["From"] = email["sender"]
+        msg['to'] = ",".join(email["receivers"])
+        msg["Subject"] = subject
+
+        try:
+            client = smtplib.SMTP_SSL(email["host"], 465)
+            client.login(email["user"], email["password"])
+            client.sendmail(email["sender"], email["receivers"], msg.as_string())
+            print("Mail has been send sucessfully")
+
+        except smtplib.SMTPException as e:
+            print(e)
+
 if __name__ == '__main__':
 
     nk = NewsKeyword()
@@ -101,7 +126,10 @@ if __name__ == '__main__':
     wechat_userids = WeChat_Config["utility"]["NewsInfo"]["userids"]
 
     for wechat_userid in wechat_userids:
-        nk.get_news_from_keyword(wechat_userid)
+        keywords_title = nk.get_news_from_keyword(wechat_userid)
+
+        for keyword in keywords_title:
+            nk.send_email(keyword, '\n'.join(keywords_title[keyword]))
 
         
 
