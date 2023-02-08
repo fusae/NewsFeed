@@ -5,6 +5,9 @@ import json
 import os
 from datetime import datetime
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 DIR_PATH = os.getcwd()
 
 CONFIG_FILE = os.path.join(DIR_PATH, "WeChat_Config.json")
@@ -77,7 +80,10 @@ class NewsCollector:
 			return False
 
 	def parse_news(self, news_url):
-		res = self.session.get(news_url)
+		try:
+			res = self.session.get(news_url, verify=False)
+		except:
+			return "No title"
 
 		text = res.text
 
@@ -121,7 +127,7 @@ class NewsCollector:
 			news_urls[userid] = NewsInfo_in_file
 
 			for each in self.userid_urls[userid]:
-				res = self.session.get(each)
+				res = self.session.get(each, verify=False)
 				absolute_links = res.html.absolute_links
 
 				for link in absolute_links:

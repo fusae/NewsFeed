@@ -3,20 +3,15 @@ from bs4 import BeautifulSoup
 import os
 import json
 from datetime import datetime
-import smtplib
-from email.mime.text import MIMEText
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 DIR_PATH = os.getcwd()
 CONFIG_FILE = os.path.join(DIR_PATH, "WeChat_Config.json")
 DATA_DIR = os.path.join(DIR_PATH, "Data")
 NEWS_DATA_DIR = os.path.join(DATA_DIR, "News")  # read
 NEWS_INFO_DIR = os.path.join(DATA_DIR, "NewsInfo") # write
-
 DATE = datetime.now().strftime("%Y-%m-%d")
-
-if not os.path.exists(NEWS_INFO_DIR):
-	os.makedirs(NEWS_INFO_DIR)
-
 
 class NewsKeyword:
 
@@ -32,7 +27,10 @@ class NewsKeyword:
 
 
     def parse_news(self, news_url):
-        res = self.session.get(news_url)
+        try:
+            res = self.session.get(news_url, verify=False)
+        except:
+            return "No title"
 
         text = res.text
 
@@ -94,46 +92,3 @@ class NewsKeyword:
                 i += 1
 
         return keywords_title
-
-    def send_email(self, subject, content):
-
-        with open(CONFIG_FILE) as f:
-            WeChat_Config = json.load(f)
-            
-        email = WeChat_Config["utility"]["NewsInfo"]["email"]
-
-        msg = MIMEText(content, 'plain', 'utf-8')
-        msg["From"] = email["sender"]
-        msg['to'] = ",".join(email["receivers"])
-        msg["Subject"] = subject
-
-        try:
-            client = smtplib.SMTP_SSL(email["host"], 465)
-            client.login(email["user"], email["password"])
-            client.sendmail(email["sender"], email["receivers"], msg.as_string())
-            print("Mail has been send sucessfully")
-
-        except smtplib.SMTPException as e:
-            print(e)
-
-if __name__ == '__main__':
-
-    nk = NewsKeyword()
-
-    with open(CONFIG_FILE) as f:
-            WeChat_Config = json.load(f)
-            
-    wechat_userids = WeChat_Config["utility"]["NewsInfo"]["userids"]
-
-    for wechat_userid in wechat_userids:
-        keywords_title = nk.get_news_from_keyword(wechat_userid)
-
-        for keyword in keywords_title:
-            nk.send_email(keyword, '\n'.join(keywords_title[keyword]))
-
-        
-
-
-
-
-    

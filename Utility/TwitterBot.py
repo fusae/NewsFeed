@@ -7,7 +7,7 @@
 import tweepy
 import os
 import json
-from WeChatPush import WeChatPush
+from Utility.WeChatPush import WeChatPush
 
 DIR_PATH = os.getcwd()
 CONFIG_NAME = os.path.join(DIR_PATH, "WeChat_Config.json") 
@@ -208,11 +208,3 @@ class TwitterBot:
             # create a new blank file
             self.user_KOL_following[wechat_userid] = {}
             return False
-
-if __name__ == '__main__':
-
-    wechatpush = WeChatPush(file_path=CONFIG_NAME, type="Twitter")
-
-    bot = TwitterBot(wechatpush)
-
-    bot.run()

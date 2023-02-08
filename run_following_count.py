@@ -1,6 +1,6 @@
-from WeChatPush import WeChatPush
+from Utility.WeChatPush import WeChatPush
 from collections import Counter
-from TwitterBot import TwitterBot
+from Utility.TwitterBot import TwitterBot
 import os
 import json
 import hashlib

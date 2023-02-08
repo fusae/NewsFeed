@@ -1,6 +1,5 @@
 import requests
 import json
-from threading import Timer
 from datetime import datetime, timedelta
 import os
 import os.path
@@ -193,16 +192,3 @@ class WeChatPush:
         text = json.loads(res.text)
         
         return text["errmsg"]
-
-
-if __name__ == '__main__':
-
-    file_path = "/Users/jamesyu/Documents/Codes/NewsFeed/WeChat_Config.json"
-    wechatpush = WeChatPush(file_path=file_path)
-
-    content = {
-        "title": "this is a test title",
-        "news_url": "https://zendaily.xyz/p/zendaily-27th-dec-2022"
-    }
-
-    wechatpush.send_message(content=content)
