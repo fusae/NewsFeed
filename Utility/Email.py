@@ -10,7 +10,7 @@ class Email:
     def __init__(self):
         pass
 
-    def send(self, subject, content):
+    def send(self, subject, content, receivers=[]):
 
         with open(CONFIG_FILE, encoding= 'utf-8') as f:
             WeChat_Config = json.load(f)
@@ -21,7 +21,9 @@ class Email:
 
         msg = MIMEText(content, 'plain', 'utf-8')
         msg["From"] = self.email["sender"]
-        msg['to'] = ",".join(self.email["receivers"])
+        if len(receivers) == 0:
+            receivers = self.email["receivers"]
+        msg['to'] = ",".join(receivers)
         msg["Subject"] = subject
 
         try:
