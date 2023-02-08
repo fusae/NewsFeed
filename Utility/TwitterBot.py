@@ -7,7 +7,6 @@
 import tweepy
 import os
 import json
-from Utility.WeChatPush import WeChatPush
 
 DIR_PATH = os.getcwd()
 CONFIG_NAME = os.path.join(DIR_PATH, "WeChat_Config.json") 
