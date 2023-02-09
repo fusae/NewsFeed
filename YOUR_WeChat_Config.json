@@ -49,7 +49,14 @@
                 "sender": "",
                 "receivers": []
             }
-        }
+        },
+
+        "NewsEmail":{
+
+            "userids_emails": {
+             "USER_ID": "EMAIL ACCOUNT"
+            }
+        }   
     }
 
 }
