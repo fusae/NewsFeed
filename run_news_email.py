@@ -11,7 +11,6 @@ DATA_DIR = os.path.join(DIR_PATH, "Data")
 NEWS_DATA_DIR = os.path.join(DATA_DIR, "News")  # read
 
 DATE = datetime.now().strftime("%Y-%m-%d")
-DATE = '2023-02-08'
 
 if __name__ == '__main__':
 
