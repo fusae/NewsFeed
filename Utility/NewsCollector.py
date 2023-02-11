@@ -128,6 +128,7 @@ class NewsCollector:
 
 			for each in self.userid_urls[userid]:
 				res = self.session.get(each, verify=False)
+				res.html.render()
 				absolute_links = res.html.absolute_links
 
 				for link in absolute_links:
@@ -179,6 +180,14 @@ class NewsCollector:
 						left = link.split(website)[1]
 						if left not in news_urls[userid][website]:
 							print("Found new panewslab post")
+							NewsInfo[website].append(left)
+
+					elif "foresightnews.pro/article" in link or  "foresightnews.pro/news" in link:
+    					
+						website = "https://foresightnews.pro/"
+						left = link.split(website)[1]
+						if left not in news_urls[userid][website]:
+							print("Found new foresightnews post")
 							NewsInfo[website].append(left)
 
 			links = []
