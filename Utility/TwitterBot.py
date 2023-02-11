@@ -7,6 +7,7 @@
 import tweepy
 import os
 import json
+from Utility.Logger import Logger
 
 DIR_PATH = os.getcwd()
 CONFIG_NAME = os.path.join(DIR_PATH, "WeChat_Config.json") 
@@ -15,6 +16,8 @@ TWITTER_DATA_DIR = os.path.join(DATA_DIR, "Twitter")
 
 if not os.path.exists(TWITTER_DATA_DIR):
 	os.makedirs(TWITTER_DATA_DIR)
+
+logger = Logger().getLogger()
 
 class TwitterBot:
     def __init__(self, wechatpush):
@@ -108,7 +111,7 @@ class TwitterBot:
             if self.user_KOL_following[wechat_userid] == {}:
                 self.user_KOL_following[wechat_userid] = currrent_following
 
-            # compare each KOL's following ids (lateest 10)
+            # compare each KOL's following ids (latest 10)
             # To see what's new folloing user id in currrent_following
             for twitter_userid in self.user_KOL_list[wechat_userid]:
                 new_following = list(set(currrent_following[str(twitter_userid)]).difference(self.user_KOL_following[wechat_userid][str(twitter_userid)]))
@@ -123,6 +126,8 @@ class TwitterBot:
                             "handle": self.get_user_username(each),
                             "username_url": "https://twitter.com/" + self.get_user_username(each)
                         }
+
+                        logger.info("{0} just followed {1}({2})!".format(self.get_user_name(twitter_userid), self.get_user_name(each), content['username_url']))
 
                         self.wechatpush.send_message(content, tousers=[wechat_userid])
 
