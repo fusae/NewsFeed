@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     email = Email()
 
-    with open(os.path.join(LOG_DIR, '{:%Y-%m-%d}.log'.format(datetime.now()))) as f:
+    with open(os.path.join(LOG_DIR, '{:%Y-%m-%d}.log'.format(datetime.now())), "rb") as f:
         data = f.read()
 
     # send email
