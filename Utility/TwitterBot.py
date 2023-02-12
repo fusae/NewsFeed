@@ -8,6 +8,8 @@ import tweepy
 import os
 import json
 from Utility.Logger import Logger
+from datetime import datetime
+import random
 
 DIR_PATH = os.getcwd()
 CONFIG_NAME = os.path.join(DIR_PATH, "WeChat_Config.json") 
@@ -18,6 +20,42 @@ if not os.path.exists(TWITTER_DATA_DIR):
 	os.makedirs(TWITTER_DATA_DIR)
 
 logger = Logger().getLogger()
+
+class TwitterClientManager:
+
+    def __init__(self):
+        with open(CONFIG_NAME) as f:
+            WeChat_Config = json.load(f)
+            self.clients = WeChat_Config["type"]["Twitter"]["clients"]
+
+        for each in self.clients:
+            self.clients[each]["count"] = 0 # request counter
+            self.clients[each]["datetime"] = None # datetime object
+
+        key  = random.choice(list(self.clients.keys()))
+        self.using_client = random.choice(self.clients[key])
+
+    # the default delta time is 15 minutes, it called after evert twitter api request
+    def update(self, delta_time = 15 * 60):
+        
+        self.using_client["count"] += 1
+        
+        # time's up
+        if self.using_client["count"] == 1:
+            self.using_client["datetime"] = datetime.now()
+
+        # if reach the max requests within 15 minutes, then should change another client
+        if self.using_client["count"] > 15:
+            total_seconds = (datetime.now() - self.using_client["datetime"]).total_seconds()
+            # 15 minutes
+            if total_seconds < delta_time:
+                for key in self.clients.keys():
+                    if self.clients[key]["count"] < 15 and (datetime.now() - self.clients[key]["datetime"]).total_seconds() > delta_time:
+                        self.using_client = self.clients[key]
+
+
+
+
 
 class TwitterBot:
     def __init__(self, wechatpush):
