@@ -32,8 +32,8 @@ class TwitterClientManager:
             self.clients[each]["count"] = 0 # request counter
             self.clients[each]["datetime"] = None # datetime object
 
-        key  = random.choice(list(self.clients.keys()))
-        self.using_client = random.choice(self.clients[key])
+        self.using_key = random.choice(list(self.clients.keys()))
+        self.using_client = self.clients[self.using_key]
 
     # the default delta time is 15 minutes, it called after evert twitter api request
     def update(self, delta_time = 15 * 60):
@@ -49,13 +49,24 @@ class TwitterClientManager:
             total_seconds = (datetime.now() - self.using_client["datetime"]).total_seconds()
             # 15 minutes
             if total_seconds < delta_time:
-                for key in self.clients.keys():
+
+                # reset count and datetime
+                self.using_client["count"] = 0
+                self.using_client["datetime"] = datetime.now()
+
+                for key in self.clients.keys() and key != self.using_key:
                     if self.clients[key]["count"] < 15 and (datetime.now() - self.clients[key]["datetime"]).total_seconds() > delta_time:
                         self.using_client = self.clients[key]
+                        self.using_key = key
 
 
+    # get using client
+    def get_using_client(self):
+        return self.using_client
 
-
+    # get using key
+    def get_using_key(self):
+        return self.using_key
 
 class TwitterBot:
     def __init__(self, wechatpush):
@@ -64,14 +75,15 @@ class TwitterBot:
             self.user_KOL_list = {}
             self.user_KOL_following = {} #read from file
             self.wechatpush = wechatpush
+            self.tcm = TwitterClientManager()
 
-
+            client = self.tcm.get_using_client()
             self.client = tweepy.Client(
-                consumer_key=WeChat_Config["type"]["Twitter"]["consumer_key"],
-                consumer_secret=WeChat_Config["type"]["Twitter"]["consumer_secret"],
-                access_token=WeChat_Config["type"]["Twitter"]["access_token"],
-                access_token_secret=WeChat_Config["type"]["Twitter"]["access_token_secret"],
-                bearer_token = WeChat_Config["type"]["Twitter"]["bearer_token"],
+                consumer_key=client["consumer_key"],
+                consumer_secret=client["consumer_secret"],
+                access_token=client["access_token"],
+                access_token_secret=client["access_token_secret"],
+                bearer_token = client["bearer_token"],
                 wait_on_rate_limit=True
             )
 
@@ -107,6 +119,7 @@ class TwitterBot:
         print("Getting {0} following from {1}".format(str(max_results), twitter_userid))
         users = []
         response = self.client.get_users_following(twitter_userid, user_fields=["profile_image_url"], max_results=max_results)
+        self.tcm.update()
 
         if response.data is None:
             pass
