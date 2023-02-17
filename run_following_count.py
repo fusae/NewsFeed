@@ -1,6 +1,7 @@
 from Utility.WeChatPush import WeChatPush
 from collections import Counter
-from Utility.TwitterBot import TwitterBot
+from Utility.TwitterBot import TwitterBot, logger
+
 import os
 import json
 import hashlib
@@ -63,7 +64,9 @@ def get_common_following(bot, userids):
                 md5_string = hashlib.md5((handle+str(count)).encode('utf-8')).hexdigest()
 
                 if md5_string not in md5_list_from_file:
-                    bot.wechatpush.send_message(content, tousers=[userid])
+                    # bot.wechatpush.send_message(content, tousers=[userid])
+                    print("The project {0}({1}) is followed by {2} KOLs!".format(username, "https://twitter.com/" + bot.get_user_username(each[0]), str(count)))
+                    logger.info("The project {0}({1}) is followed by {2} KOLs!".format(username, "https://twitter.com/" + bot.get_user_username(each[0]), str(count)))
                     md5_list_from_file.append(md5_string)
 
         with open(user_file, "w") as f:
