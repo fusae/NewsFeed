@@ -232,30 +232,29 @@ class TwitterBot:
             data = json.load(f)
             f.close()
 
-            if len(self.user_KOL_following[wechat_userid]) != len(self.user_KOL_list[wechat_userid]):
-                for each in self.user_KOL_list[wechat_userid]:
-                    try:
-                        ids = self.user_KOL_following[wechat_userid][str(each)]
-                    except KeyError:
-                        twitter_userid = each
-                        users = self.list_user_following(twitter_userid=twitter_userid)
-                        ids = []
-                        for user in users:
-                            ids.append(user[0])
+            for each in self.user_KOL_list[wechat_userid]:
+                try:
+                    ids = self.user_KOL_following[wechat_userid][str(each)]
+                except KeyError:
+                    twitter_userid = each
+                    users = self.list_user_following(twitter_userid=twitter_userid)
+                    ids = []
+                    for user in users:
+                        ids.append(user[0])
 
-                        self.user_KOL_following[wechat_userid][str(twitter_userid)] = ids
+                    self.user_KOL_following[wechat_userid][str(twitter_userid)] = ids
 
 
-                for i in list(self.user_KOL_following[wechat_userid]):
-                    if int(i) in self.user_KOL_list:
-                        continue
-                    else:
-                        self.user_KOL_following[wechat_userid].pop(i)
-                
-                # update to local file
-                with open(file_name, "w") as f:
-                    data = json.dumps(self.user_KOL_following[wechat_userid])
-                    f.write(data)
+            for i in list(self.user_KOL_following[wechat_userid]):
+                if int(i) in self.user_KOL_list:
+                    continue
+                else:
+                    self.user_KOL_following[wechat_userid].pop(i)
+            
+            # update to local file
+            with open(file_name, "w") as f:
+                data = json.dumps(self.user_KOL_following[wechat_userid])
+                f.write(data)
 
             return True
 
