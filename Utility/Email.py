@@ -7,8 +7,8 @@ DIR_PATH = os.getcwd()
 CONFIG_FILE = os.path.join(DIR_PATH, "WeChat_Config.json")
 
 class Email:
-    def __init__(self):
-        pass
+    def __init__(self, type='plain'):
+        self.type = type
 
     def send(self, subject, content, receivers=[]):
 
@@ -19,7 +19,7 @@ class Email:
         self.client = smtplib.SMTP_SSL(self.email["host"], 465)
         self.client.login(self.email["user"], self.email["password"])
 
-        msg = MIMEText(content, 'plain', 'utf-8')
+        msg = MIMEText(content, self.type, 'utf-8')
         msg["From"] = self.email["sender"]
         if len(receivers) == 0:
             receivers = self.email["receivers"]

@@ -14,7 +14,7 @@ DATE = datetime.now().strftime("%Y-%m-%d")
 
 if __name__ == '__main__':
 
-    email = Email()
+    email = Email(type='html')
     nk = NewsKeyword()
 
     print("running news email...")
@@ -28,6 +28,7 @@ if __name__ == '__main__':
         read_user_file = os.path.join(read_user_dir, DATE + ".json")
 
         titles = []
+        html_text = []
         with open(read_user_file) as f:
             data = json.load(f)
             NewsInfo = data['NewsInfo']
@@ -38,10 +39,12 @@ if __name__ == '__main__':
                     title = nk.parse_news(website+left)
                     print("{}".format(i), title)
                     title = ("{} ".format(i)+title)
-                    titles.append(title)
+                    # titles.append(title)
+                    html_text.append("<p><a href={0}>{1}</a></p>".format(website+left, title))
                     i += 1
         
         # send email
-        email.send("News-"+DATE, '\n'.join(titles), userids_emails[wechat_userid])
+        # email.send("News-"+DATE, '\n'.join(titles), userids_emails[wechat_userid])
+        email.send("News-"+DATE, "".join(html_text), userids_emails[wechat_userid])
 
     
