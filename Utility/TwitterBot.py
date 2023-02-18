@@ -180,7 +180,7 @@ class TwitterBot:
 
                         logger.info("{0} just followed {1}({2})!".format(self.get_user_name(twitter_userid), self.get_user_name(each), content['username_url']))
 
-                        self.wechatpush.send_message(content, tousers=[wechat_userid])
+                        # self.wechatpush.send_message(content, tousers=[wechat_userid])
 
                     # update currrent_following to local file
                     user_file = os.path.join(TWITTER_DATA_DIR, wechat_userid + ".json")
@@ -246,7 +246,7 @@ class TwitterBot:
 
 
             for i in list(self.user_KOL_following[wechat_userid]):
-                if int(i) in self.user_KOL_list:
+                if int(i) in self.user_KOL_list[wechat_userid]:
                     continue
                 else:
                     self.user_KOL_following[wechat_userid].pop(i)
